@@ -4,12 +4,12 @@ import './styles.css';
 
 const RARITY_CHANCES = {
   LR:  0.005,
-  SSR: 0.025,
-  UR:  0.05,
-  SR:  0.12,
-  R:   0.20,
+  SSR: 0.03,
+  UR:  0.01,
+  SR:  0.055,
+  R:   0.15,
   UC:  0.25,
-  C:   0.35 
+  C:   0.50 
 };
 
 const CARDS_PER_PACK = 7;
@@ -203,3 +203,4 @@ export default function BibleGachaApp() {
     </div>
   );
 }
+
