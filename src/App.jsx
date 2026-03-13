@@ -21,7 +21,7 @@ export default function BibleGachaApp() {
   const [revealIndex, setRevealIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [isTearing, setIsTearing] = useState(false); // New animation state
-
+  const [startX, setStartX] = useState(null); // NEW: Tracks swipe start position
   useEffect(() => {
     try {
       const saved = localStorage.getItem('bibleGachaCollection');
@@ -108,7 +108,23 @@ export default function BibleGachaApp() {
   };
 
   const formatCardName = (id) => id ? id.split('_')[0].replace(/-/g, ' ') : "Unknown";
+  const handleDragStart = (e) => {
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    setStartX(clientX);
+  };
 
+  // Handles the end of a touch or mouse drag
+  const handleDragEnd = (e) => {
+    if (startX === null) return;
+    const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+    const distance = startX - clientX;
+
+    // If they swiped left by at least 50 pixels and the card is flipped
+    if (distance > 50 && flipped) {
+      nextCard();
+    }
+    setStartX(null); // Reset for the next swipe
+  };
   return (
     <div className="app-container">
       <nav className="navbar">
@@ -202,6 +218,7 @@ export default function BibleGachaApp() {
     </div>
   );
 }
+
 
 
 
