@@ -4,8 +4,8 @@ import './styles.css';
 
 const RARITY_CHANCES = {
   LR:  0.005,
-  SSR: 0.03,
   UR:  0.01,
+  SSR: 0.03,
   SR:  0.055,
   R:   0.15,
   UC:  0.25,
@@ -36,7 +36,7 @@ export default function BibleGachaApp() {
   }, [collection]);
 
   const cardsByRarity = useMemo(() => {
-    const grouped = { LR: [], SSR: [], UR: [], SR: [], R: [], UC: [], C: [] };
+    const grouped = { LR: [],  UR: [], SSR: [], SR: [], R: [], UC: [], C: [] };
     cardsData.forEach(card => {
       const r = card.Rarity;
       if (grouped[r]) grouped[r].push(card);
@@ -203,4 +203,5 @@ export default function BibleGachaApp() {
     </div>
   );
 }
+
 
