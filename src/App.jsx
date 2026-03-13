@@ -145,7 +145,7 @@ export default function BibleGachaApp() {
         <div className="collection-screen">
           <h1>Your Collection</h1>
           <div className="stats-grid">
-            {Object.entries(getCollectionStats()).map(([rarity, stat])]) => (
+            {Object.entries(getCollectionStats()).map(([rarity, stat])) => (
               <div key={rarity} className="stat-box">
                 <strong>{rarity}</strong>
                 <p>{stat.collected} / {stat.total}</p>
@@ -173,4 +173,5 @@ export default function BibleGachaApp() {
       )}
     </div>
   );
+
 }
