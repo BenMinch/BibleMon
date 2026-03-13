@@ -21,8 +21,14 @@ export default function BibleGachaApp() {
 
   // Load collection from local storage on startup
   useEffect(() => {
-    const saved = localStorage.getItem('bibleGachaCollection');
-    if (saved) setCollection(JSON.parse(saved));
+    try {
+      const saved = localStorage.getItem('bibleGachaCollection');
+      if (saved) {
+        setCollection(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error("Failed to load collection", e);
+    }
   }, []);
 
   // Save collection whenever it updates
@@ -30,11 +36,14 @@ export default function BibleGachaApp() {
     localStorage.setItem('bibleGachaCollection', JSON.stringify(collection));
   }, [collection]);
 
-  // Organize cards by rarity for the pulling logic
+  // Organize cards by rarity safely
   const cardsByRarity = useMemo(() => {
     const grouped = { UR: [], SR: [], R: [], C: [] };
     cardsData.forEach(card => {
-      if (grouped[card.Rarity]) grouped[card.Rarity].push(card);
+      const r = card.Rarity;
+      if (grouped[r]) {
+        grouped[r].push(card);
+      }
     });
     return grouped;
   }, []);
@@ -44,31 +53,38 @@ export default function BibleGachaApp() {
     for (let i = 0; i < CARDS_PER_PACK; i++) {
       const rand = Math.random();
       let cumulative = 0;
+      let selectedRarity = 'C'; // Fallback rarity
       
       for (const [rarity, chance] of Object.entries(RARITY_CHANCES)) {
         cumulative += chance;
         if (rand <= cumulative) {
-          const pool = cardsByRarity[rarity];
-          // Pick a random card from this rarity pool
-          const pulledCard = pool[Math.floor(Math.random() * pool.length)];
-          newPack.push(pulledCard);
+          selectedRarity = rarity;
           break;
         }
       }
+
+      const pool = cardsByRarity[selectedRarity];
+      if (pool && pool.length > 0) {
+        const pulledCard = pool[Math.floor(Math.random() * pool.length)];
+        newPack.push(pulledCard);
+      }
     }
 
-    // Add to collection (keeping unique IDs)
-    const newCollection = new Set([...collection, ...newPack.map(c => c.Card_ID)]);
-    setCollection(Array.from(newCollection));
-
-    setCurrentPack(newPack);
-    setRevealIndex(0);
-    setFlipped(false);
-    setView('opening');
+    if (newPack.length > 0) {
+      // Add to collection (keeping unique IDs)
+      const newCollection = new Set([...collection, ...newPack.map(c => c.Card_ID)]);
+      setCollection(Array.from(newCollection));
+      setCurrentPack(newPack);
+      setRevealIndex(0);
+      setFlipped(false);
+      setView('opening');
+    } else {
+      alert("Error: No cards available to pull. Check your cards.json data!");
+    }
   };
 
   const nextCard = () => {
-    if (revealIndex < CARDS_PER_PACK - 1) {
+    if (revealIndex < currentPack.length - 1) {
       setFlipped(false);
       setTimeout(() => {
         setRevealIndex(prev => prev + 1);
@@ -84,13 +100,24 @@ export default function BibleGachaApp() {
       const total = cardsByRarity[rarity].length;
       if (total === 0) return;
       
-      const collected = collection.filter(id => 
-        cardsData.find(c => c.Card_ID === id)?.Rarity === rarity
-      ).length;
+      const collected = collection.filter(id => {
+        const card = cardsData.find(c => c.Card_ID === id);
+        return card && card.Rarity === rarity;
+      }).length;
       
-      stats[rarity] = { collected, total, percentage: Math.round((collected / total) * 100) };
+      stats[rarity] = { 
+        collected, 
+        total, 
+        percentage: Math.round((collected / total) * 100) 
+      };
     });
     return stats;
+  };
+
+  // Utility to format names nicely (e.g., "john_1" -> "John")
+  const formatCardName = (id) => {
+    if (!id) return "Unknown";
+    return id.split('_')[0].replace(/-/g, ' ');
   };
 
   return (
@@ -112,9 +139,9 @@ export default function BibleGachaApp() {
       )}
 
       {/* PACK OPENING VIEW */}
-      {view === 'opening' && currentPack.length > 0 && (
+      {view === 'opening' && currentPack.length > 0 && currentPack[revealIndex] && (
         <div className="opening-screen">
-          <h3>Card {revealIndex + 1} of {CARDS_PER_PACK}</h3>
+          <h3>Card {revealIndex + 1} of {currentPack.length}</h3>
           
           <div className="card-container" onClick={() => setFlipped(true)}>
             <div className={`card-inner ${flipped ? 'flipped' : ''}`}>
@@ -126,15 +153,15 @@ export default function BibleGachaApp() {
               {/* Card Front (Revealed) */}
               <div className={`card-front rarity-${currentPack[revealIndex].Rarity}`}>
                 <span className="rarity-badge">{currentPack[revealIndex].Rarity}</span>
-                <h2>{currentPack[revealIndex].Card_ID.split('_')[0]}</h2>
-                <p>{currentPack[revealIndex].description}</p>
+                <h2>{formatCardName(currentPack[revealIndex].Card_ID)}</h2>
+                <p>{currentPack[revealIndex].description || "A biblical concept."}</p>
               </div>
             </div>
           </div>
 
           {flipped && (
             <button className="next-btn" onClick={nextCard}>
-              {revealIndex < CARDS_PER_PACK - 1 ? 'Next Card' : 'Finish Pack'}
+              {revealIndex < currentPack.length - 1 ? 'Next Card' : 'Finish Pack'}
             </button>
           )}
         </div>
@@ -145,7 +172,7 @@ export default function BibleGachaApp() {
         <div className="collection-screen">
           <h1>Your Collection</h1>
           <div className="stats-grid">
-            {Object.entries(getCollectionStats()).map(([rarity, stat])) => (
+            {Object.entries(getCollectionStats()).map(([rarity, stat]) => (
               <div key={rarity} className="stat-box">
                 <strong>{rarity}</strong>
                 <p>{stat.collected} / {stat.total}</p>
@@ -163,7 +190,7 @@ export default function BibleGachaApp() {
               if (!card) return null;
               return (
                 <div key={id} className={`mini-card rarity-${card.Rarity}`}>
-                  <strong>{card.Card_ID.split('_')[0]}</strong>
+                  <strong>{formatCardName(card.Card_ID)}</strong>
                   <span>{card.Rarity}</span>
                 </div>
               );
@@ -173,5 +200,4 @@ export default function BibleGachaApp() {
       )}
     </div>
   );
-
 }
