@@ -167,10 +167,17 @@ export default function BibleGachaApp() {
         </div>
       )}
 
-      {/* PACK OPENING VIEW (CARD REVEAL) */}
+{/* PACK OPENING VIEW (CARD REVEAL) */}
       {view === 'opening' && currentPack.length > 0 && currentPack[revealIndex] && (
-        <div className="opening-screen">
+        <div 
+          className="opening-screen"
+          onTouchStart={handleDragStart}
+          onTouchEnd={handleDragEnd}
+          onMouseDown={handleDragStart}
+          onMouseUp={handleDragEnd}
+        >
           <h3>Card {revealIndex + 1} of {currentPack.length}</h3>
+          
           <div className="card-container" onClick={() => setFlipped(true)}>
             <div className={`card-inner ${flipped ? 'flipped' : ''}`}>
               <div className="card-back"><div className="card-design">TAP TO REVEAL</div></div>
@@ -181,14 +188,14 @@ export default function BibleGachaApp() {
               </div>
             </div>
           </div>
+
           {flipped && (
-            <button className="next-btn" onClick={nextCard}>
-              {revealIndex < currentPack.length - 1 ? 'Next Card' : 'Finish Pack'}
-            </button>
+            <div className="swipe-hint">
+              {revealIndex < currentPack.length - 1 ? '👈 Swipe left for next card' : '👈 Swipe left to finish'}
+            </div>
           )}
         </div>
       )}
-
       {/* COLLECTION VIEW */}
       {view === 'collection' && (
         <div className="collection-screen">
@@ -218,6 +225,7 @@ export default function BibleGachaApp() {
     </div>
   );
 }
+
 
 
 
