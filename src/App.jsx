@@ -144,9 +144,7 @@ export default function BibleGachaApp() {
             
             {/* The main body of the foil pack */}
             <div className="pack-body">
-              <div className="pack-logo">BibleMon</div>
               <div className="pack-subtitle">7 Cards Inside</div>
-              <div className="pack-art">✨</div>
               <div className="pack-crimp bottom-crimp"></div>
             </div>
           </div>
@@ -204,6 +202,7 @@ export default function BibleGachaApp() {
     </div>
   );
 }
+
 
 
 
