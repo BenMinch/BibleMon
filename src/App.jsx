@@ -184,6 +184,7 @@ export default function BibleGachaApp() {
               <div key={rarity} className="stat-box">
                 <strong>{rarity}</strong><p>{stat.collected} / {stat.total}</p>
                 <div className="progress-bar"><div className="progress-fill" style={{ width: `${stat.percentage}%` }}></div></div>
+                <small>{stat.percentage}% Complete</small>
               </div>
             ))}
           </div>
@@ -203,5 +204,6 @@ export default function BibleGachaApp() {
     </div>
   );
 }
+
 
 
