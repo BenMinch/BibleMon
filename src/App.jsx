@@ -126,7 +126,7 @@ export default function BibleGachaApp() {
   return (
     <div className="app-container">
       <nav className="navbar">
-        <h2>BibleGacha</h2>
+        <h2>BibleMon</h2>
         <div>
           <button onClick={() => setView('home')}>Home</button>
           <button onClick={() => setView('collection')}>Collection</button>
@@ -202,4 +202,5 @@ export default function BibleGachaApp() {
     </div>
   );
 }
+
 
