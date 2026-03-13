@@ -91,16 +91,22 @@ body {
 }
 
 /* Rarity Colors */
-.rarity-UR { border-color: #ffd700; background: #fffcf0; }
-.rarity-SR { border-color: #ff00ff; background: #fff0ff; }
-.rarity-R { border-color: #00bfff; background: #f0f8ff; }
-.rarity-C { border-color: #a9a9a9; }
+.rarity-LR { border-color: #ff4500; background: #fff0eb; box-shadow: 0 0 15px #ff4500; } /* Legendary */
+.rarity-SSR { border-color: #00ffff; background: #e0ffff; box-shadow: 0 0 10px #00ffff; } /* Super Super Rare */
+.rarity-UR { border-color: #ffd700; background: #fffcf0; } /* Ultra Rare */
+.rarity-SR { border-color: #ff00ff; background: #fff0ff; } /* Super Rare */
+.rarity-R { border-color: #00bfff; background: #f0f8ff; } /* Rare */
+.rarity-UC { border-color: #32cd32; background: #f0fff0; } /* Uncommon */
+.rarity-C { border-color: #a9a9a9; background: #ffffff; } /* Common */
 
 .rarity-badge {
   position: absolute;
   top: 10px;
   right: 10px;
   font-weight: bold;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.1);
 }
 
 /* Collection Stats Grid */
@@ -144,4 +150,5 @@ body {
   border-radius: 5px;
   border: 2px solid #ddd;
   font-size: 0.8rem;
+
 }
