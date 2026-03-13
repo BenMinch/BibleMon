@@ -5,12 +5,12 @@ import './styles.css';
 // 1. UPDATED DROP RATES (Must equal 1.0 total)
 const RARITY_CHANCES = {
   LR:  0.005, // 0.5% chance (Legendary)
-  SSR: 0.025, // 2.5% chance (Super Super Rare)
-  UR:  0.05,  // 5% chance (Ultra Rare)
-  SR:  0.12,  // 12% chance (Super Rare)
-  R:   0.20,  // 20% chance (Rare)
+  SSR: 0.03, // 2.5% chance (Super Super Rare)
+  UR:  0.01,  // 5% chance (Ultra Rare)
+  SR:  0.055,  // 12% chance (Super Rare)
+  R:   0.15,  // 20% chance (Rare)
   UC:  0.25,  // 25% chance (Uncommon)
-  C:   0.35   // 35% chance (Common)
+  C:   0.50   // 35% chance (Common)
 };
 
 const CARDS_PER_PACK = 7;
@@ -202,3 +202,4 @@ export default function BibleGachaApp() {
     </div>
   );
 }
+
