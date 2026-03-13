@@ -2,18 +2,21 @@ import React, { useState, useEffect, useMemo } from 'react';
 import cardsData from './cards.json';
 import './styles.css';
 
-// 1. DEFINE YOUR DROP RATES HERE
+// 1. UPDATED DROP RATES (Must equal 1.0 total)
 const RARITY_CHANCES = {
-  UR: 0.03, // 3% chance
-  SR: 0.12, // 12% chance
-  R: 0.35,  // 35% chance
-  C: 0.50   // 50% chance
+  LR:  0.005, // 0.5% chance (Legendary)
+  SSR: 0.025, // 2.5% chance (Super Super Rare)
+  UR:  0.05,  // 5% chance (Ultra Rare)
+  SR:  0.12,  // 12% chance (Super Rare)
+  R:   0.20,  // 20% chance (Rare)
+  UC:  0.25,  // 25% chance (Uncommon)
+  C:   0.35   // 35% chance (Common)
 };
 
 const CARDS_PER_PACK = 7;
 
 export default function BibleGachaApp() {
-  const [view, setView] = useState('home'); // 'home', 'opening', 'collection'
+  const [view, setView] = useState('home'); 
   const [collection, setCollection] = useState([]);
   const [currentPack, setCurrentPack] = useState([]);
   const [revealIndex, setRevealIndex] = useState(0);
@@ -36,9 +39,9 @@ export default function BibleGachaApp() {
     localStorage.setItem('bibleGachaCollection', JSON.stringify(collection));
   }, [collection]);
 
-  // Organize cards by rarity safely
+  // Organize cards by the NEW rarities safely
   const cardsByRarity = useMemo(() => {
-    const grouped = { UR: [], SR: [], R: [], C: [] };
+    const grouped = { LR: [], SSR: [], UR: [], SR: [], R: [], UC: [], C: [] };
     cardsData.forEach(card => {
       const r = card.Rarity;
       if (grouped[r]) {
@@ -53,7 +56,7 @@ export default function BibleGachaApp() {
     for (let i = 0; i < CARDS_PER_PACK; i++) {
       const rand = Math.random();
       let cumulative = 0;
-      let selectedRarity = 'C'; // Fallback rarity
+      let selectedRarity = 'C'; 
       
       for (const [rarity, chance] of Object.entries(RARITY_CHANCES)) {
         cumulative += chance;
@@ -63,7 +66,9 @@ export default function BibleGachaApp() {
         }
       }
 
-      const pool = cardsByRarity[selectedRarity];
+      // If a rarity pool is empty in your CSV, fallback to Common
+      const pool = cardsByRarity[selectedRarity].length > 0 ? cardsByRarity[selectedRarity] : cardsByRarity['C'];
+      
       if (pool && pool.length > 0) {
         const pulledCard = pool[Math.floor(Math.random() * pool.length)];
         newPack.push(pulledCard);
@@ -71,7 +76,6 @@ export default function BibleGachaApp() {
     }
 
     if (newPack.length > 0) {
-      // Add to collection (keeping unique IDs)
       const newCollection = new Set([...collection, ...newPack.map(c => c.Card_ID)]);
       setCollection(Array.from(newCollection));
       setCurrentPack(newPack);
@@ -79,7 +83,7 @@ export default function BibleGachaApp() {
       setFlipped(false);
       setView('opening');
     } else {
-      alert("Error: No cards available to pull. Check your cards.json data!");
+      alert("Error: No cards available. Check your cards.json!");
     }
   };
 
@@ -88,7 +92,7 @@ export default function BibleGachaApp() {
       setFlipped(false);
       setTimeout(() => {
         setRevealIndex(prev => prev + 1);
-      }, 300); // Wait for flip animation to reset before changing data
+      }, 300); 
     } else {
       setView('home');
     }
@@ -114,7 +118,6 @@ export default function BibleGachaApp() {
     return stats;
   };
 
-  // Utility to format names nicely (e.g., "john_1" -> "John")
   const formatCardName = (id) => {
     if (!id) return "Unknown";
     return id.split('_')[0].replace(/-/g, ' ');
@@ -145,12 +148,10 @@ export default function BibleGachaApp() {
           
           <div className="card-container" onClick={() => setFlipped(true)}>
             <div className={`card-inner ${flipped ? 'flipped' : ''}`}>
-              {/* Card Back (Unrevealed) */}
               <div className="card-back">
                 <div className="card-design">TAP TO REVEAL</div>
               </div>
               
-              {/* Card Front (Revealed) */}
               <div className={`card-front rarity-${currentPack[revealIndex].Rarity}`}>
                 <span className="rarity-badge">{currentPack[revealIndex].Rarity}</span>
                 <h2>{formatCardName(currentPack[revealIndex].Card_ID)}</h2>
